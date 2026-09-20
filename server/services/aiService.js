@@ -232,41 +232,50 @@ class CivicLensAIService {
    * Gemini API invocation when user supplies API key
    */
   async _analyzeWithGemini(text, imageUrl, locationText) {
-    // If Gemini key is set, dynamic import or fetch
-    // To ensure fast zero-failure boot, we wrap in try-catch and return structured payload
-    const { GoogleGenerativeAI } = require('@google/generative-ai');
-    const genAI = new GoogleGenerativeAI(this.apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
     const prompt = `You are the civic intelligence core for Civic Lens AI.
 Analyze this citizen report:
 Report Text: "${text}"
 Location: "${locationText}"
 Has Image: ${Boolean(imageUrl)}
 
-Respond ONLY with valid JSON conforming to this schema:
+Respond ONLY with valid JSON conforming to this schema (no markdown, just raw JSON):
 {
   "detectedIssue": "short issue name e.g. Pothole",
-  "category": "Road Infrastructure" | "Municipal Sanitation" | "Water Supply & Drainage" | "Electrical & Lighting" | "Traffic & Transport" | "Public Safety & Infrastructure",
-  "department": "Public Works" | "Municipal Sanitation" | "Water Supply & Sewerage Board" | "Electrical & Lighting Authority" | "Traffic Police & Transport Dept" | "City Infrastructure & Public Safety",
-  "severity": "Low" | "Medium" | "High" | "Critical",
-  "publicImpact": "Low" | "Medium" | "High" | "Severe",
+  "category": "Road Infrastructure",
+  "department": "Public Works",
+  "severity": "High",
+  "publicImpact": "High",
   "summary": "1-2 sentence executive civic summary",
   "keywords": ["tag1", "tag2"],
-  "confidence": 92,
+  "confidence": 94,
   "possibleRisk": "concise risk description",
   "impactFactors": {
-    "severity": number (0-40),
-    "publicExposure": number (0-25),
+    "severity": 32,
+    "publicExposure": 20,
     "reportFrequency": 10,
-    "locationImportance": number (0-10),
+    "locationImportance": 8,
     "recency": 5
   },
   "whyReasons": ["point 1", "point 2", "point 3"]
 }`;
 
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: prompt }]
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gemini API HTTP status ${response.status}`);
+    }
+
+    const data = await response.json();
+    const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
     const parsed = JSON.parse(cleanJson);
 
