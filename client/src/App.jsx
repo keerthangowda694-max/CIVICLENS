@@ -9,6 +9,10 @@ import FloatingCopilot from './components/common/FloatingCopilot';
 
 import LandingPage from './pages/LandingPage';
 import AuthPage from './pages/AuthPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import InfoPage from './pages/InfoPage';
+import DemoPage from './pages/DemoPage';
 import CitizenDashboardPage from './pages/CitizenDashboardPage';
 import SmartReportPage from './pages/SmartReportPage';
 import ExploreIssuesPage from './pages/ExploreIssuesPage';
@@ -43,8 +47,20 @@ function MainApp() {
     if (currentPath === '/' || currentPath === '') {
       return <LandingPage setRoute={navigateTo} />;
     }
-    if (currentPath === '/auth' || currentPath === '/login' || currentPath === '/register') {
-      return <AuthPage setRoute={navigateTo} />;
+    if (currentPath === '/login') {
+      return <LoginPage setRoute={navigateTo} />;
+    }
+    if (currentPath === '/register') {
+      return <RegisterPage setRoute={navigateTo} />;
+    }
+    if (currentPath === '/auth') {
+      return <LoginPage setRoute={navigateTo} />;
+    }
+    if (currentPath === '/info' || currentPath === '/about') {
+      return <InfoPage setRoute={navigateTo} />;
+    }
+    if (currentPath === '/demo' || currentPath === '/walkthrough') {
+      return <DemoPage setRoute={navigateTo} />;
     }
     if (currentPath === '/dashboard') {
       return <CitizenDashboardPage setRoute={navigateTo} />;

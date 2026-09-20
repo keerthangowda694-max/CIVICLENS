@@ -46,13 +46,16 @@ export default function Footer({ setRoute }) {
 
           {/* Quick Nav */}
           <div>
-            <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-3">Intelligence</h4>
+            <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-3">Intelligence & Hub</h4>
             <ul className="space-y-2 text-xs">
+              <li><button onClick={() => setRoute('/demo')} className="text-amber-400 font-semibold hover:text-amber-300">★ Interactive Live Demo</button></li>
+              <li><button onClick={() => setRoute('/info')} className="hover:text-cyan-400">Platform Architecture & Scoring</button></li>
+              <li><button onClick={() => setRoute('/profile')} className="hover:text-cyan-400">Contributor Profile & Badges</button></li>
+              <li><button onClick={() => setRoute('/login')} className="hover:text-cyan-400">Sign In / Demo Accounts</button></li>
               <li><button onClick={() => setRoute('/dashboard')} className="hover:text-cyan-400">Citizen Dashboard</button></li>
               <li><button onClick={() => setRoute('/report')} className="hover:text-cyan-400">Smart AI Report</button></li>
               <li><button onClick={() => setRoute('/issues')} className="hover:text-cyan-400">Explore Civic Issues</button></li>
               <li><button onClick={() => setRoute('/map')} className="hover:text-cyan-400">Civic Problem Heatmap</button></li>
-              <li><button onClick={() => setRoute('/assistant')} className="hover:text-cyan-400">✨ Ask Civic Copilot</button></li>
             </ul>
           </div>
 

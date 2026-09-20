@@ -16,7 +16,9 @@ import {
   Menu,
   X,
   Building2,
-  CheckCircle2
+  CheckCircle2,
+  Play,
+  Info
 } from 'lucide-react';
 
 export default function Navbar({ currentPath, setRoute }) {
@@ -31,6 +33,8 @@ export default function Navbar({ currentPath, setRoute }) {
     { name: 'Explore', path: '/issues', icon: MapPin },
     { name: 'Heatmap', path: '/map', icon: Flame },
     { name: 'Copilot', path: '/assistant', icon: Bot },
+    { name: 'Live Demo', path: '/demo', icon: Play, demoPill: true },
+    { name: 'Info', path: '/info', icon: Info },
     { name: 'Command Center', path: '/admin', icon: ShieldAlert, adminOnly: true },
   ];
 
@@ -82,15 +86,19 @@ export default function Navbar({ currentPath, setRoute }) {
                 <button
                   key={link.name}
                   onClick={() => handleNav(link.path)}
-                  className={`flex items-center space-x-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                     link.highlight
                       ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-md shadow-blue-500/20 hover:shadow-cyan-500/30'
+                      : link.demoPill
+                      ? isActive
+                        ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50 font-bold'
+                        : 'text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 border border-amber-500/30 font-semibold'
                       : isActive
                       ? 'bg-slate-800 text-cyan-400 border border-slate-700'
                       : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-3.5 h-3.5" />
                   <span>{link.name}</span>
                 </button>
               );
@@ -101,27 +109,27 @@ export default function Navbar({ currentPath, setRoute }) {
           <div className="flex items-center space-x-3">
             
             {/* Quick Demo Switcher */}
-            <div className="hidden lg:flex items-center bg-slate-800/80 p-1 rounded-lg border border-slate-700 text-xs">
-              <span className="text-slate-400 px-2 font-medium">Demo Mode:</span>
+            <div className="hidden xl:flex items-center bg-slate-800/80 p-1 rounded-lg border border-slate-700 text-xs">
+              <span className="text-slate-400 px-2 font-medium">Demo:</span>
               <button
                 onClick={() => loginAsDemo('citizen')}
-                className={`px-2.5 py-1 rounded transition-colors ${
+                className={`px-2 py-0.5 rounded transition-colors ${
                   user?.role === 'citizen'
                     ? 'bg-cyan-500 text-white font-semibold'
                     : 'text-slate-300 hover:text-white'
                 }`}
               >
-                Alex (Citizen)
+                Citizen
               </button>
               <button
                 onClick={() => loginAsDemo('authority')}
-                className={`px-2.5 py-1 rounded transition-colors ${
+                className={`px-2 py-0.5 rounded transition-colors ${
                   user?.role === 'authority' || user?.role === 'admin'
                     ? 'bg-blue-600 text-white font-semibold'
                     : 'text-slate-300 hover:text-white'
                 }`}
               >
-                Sarah (Authority)
+                Admin
               </button>
             </div>
 
@@ -175,6 +183,22 @@ export default function Navbar({ currentPath, setRoute }) {
                       <span>Contributor Profile</span>
                     </button>
 
+                    <button
+                      onClick={() => handleNav('/demo')}
+                      className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 flex items-center space-x-2"
+                    >
+                      <Play className="w-4 h-4 text-amber-400" />
+                      <span>Interactive Demo</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleNav('/info')}
+                      className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 flex items-center space-x-2"
+                    >
+                      <Info className="w-4 h-4 text-teal-400" />
+                      <span>Architecture & Docs</span>
+                    </button>
+
                     {user.role === 'authority' && (
                       <button
                         onClick={() => handleNav('/admin')}
@@ -201,12 +225,20 @@ export default function Navbar({ currentPath, setRoute }) {
                 )}
               </div>
             ) : (
-              <button
-                onClick={() => handleNav('/auth')}
-                className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors"
-              >
-                Sign In
-              </button>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => handleNav('/login')}
+                  className="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-semibold transition-colors shadow-md shadow-blue-500/20"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => handleNav('/register')}
+                  className="hidden sm:inline-flex px-3 py-1.5 rounded-lg border border-slate-700 hover:border-cyan-500/50 text-slate-300 hover:text-white text-xs sm:text-sm font-medium transition-colors"
+                >
+                  Register
+                </button>
+              </div>
             )}
 
             {/* Mobile Menu Toggle */}
@@ -224,6 +256,9 @@ export default function Navbar({ currentPath, setRoute }) {
       {mobileMenuOpen && (
         <div className="md:hidden bg-navy-900 border-b border-slate-800 px-4 pt-2 pb-4 space-y-2">
           {navLinks.map((link) => {
+            if (link.adminOnly && user?.role !== 'authority' && user?.role !== 'admin') {
+              return null;
+            }
             const Icon = link.icon;
             return (
               <button
@@ -236,6 +271,34 @@ export default function Navbar({ currentPath, setRoute }) {
               </button>
             );
           })}
+
+          <div className="pt-2 border-t border-slate-800 space-y-2">
+            <button
+              onClick={() => handleNav('/profile')}
+              className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left text-sm text-slate-300 hover:bg-slate-800"
+            >
+              <User className="w-4 h-4 text-cyan-400" />
+              <span>My Profile & Badges</span>
+            </button>
+
+            {!user ? (
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <button
+                  onClick={() => handleNav('/login')}
+                  className="w-full py-2 rounded-lg bg-blue-600 text-white text-center text-xs font-semibold"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => handleNav('/register')}
+                  className="w-full py-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 text-center text-xs font-semibold"
+                >
+                  Register
+                </button>
+              </div>
+            ) : null}
+          </div>
+
           <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
             <span className="text-xs text-slate-400">Demo Role:</span>
             <div className="flex space-x-2">
